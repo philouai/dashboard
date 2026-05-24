@@ -2,629 +2,347 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0C0C10">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Philou.ai">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="description" content="Philou personal AI dashboard">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<title>Philou.ai</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bedtime Stories</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap');
-
 :root {
-  --bg:        #0C0C10;
-  --bg-1:      #131318;
-  --bg-2:      #1A1A22;
-  --bg-3:      #22222E;
-  --border:    rgba(255,255,255,0.07);
-  --border-md: rgba(255,255,255,0.12);
-  --border-hi: rgba(255,255,255,0.22);
-  --text:      #EEEAE2;
-  --text-2:    #8C8880;
-  --text-3:    #4A4844;
-  --accent:    #C9A84C;
-  --accent-lo: rgba(201,168,76,0.12);
-  --accent-md: rgba(201,168,76,0.25);
-  --red:       #E05A52;
-  --blue:      #4A9EE8;
-  --green:     #4ACA7A;
-  --sidebar-w: 220px;
-  --topbar-h:  52px;
-  --safe-top:    env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left:   env(safe-area-inset-left, 0px);
-  --safe-right:  env(safe-area-inset-right, 0px);
+  --bg:#0C0C10;--bg-1:#131318;--bg-2:#1A1A22;--bg-3:#22222E;
+  --border:rgba(255,255,255,0.07);--border-md:rgba(255,255,255,0.12);
+  --text:#EEEAE2;--text-2:#8C8880;--text-3:#4A4844;
+  --accent:#C9A84C;--accent-lo:rgba(201,168,76,0.12);--accent-md:rgba(201,168,76,0.25);
+  --blue:#4A9EE8;--green:#4ACA7A;--red:#E05A52;
 }
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html, body {
-  height: 100%; height: 100dvh;
-  font-family: 'Inter', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  overflow: hidden;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* ── Shell ── */
-.shell { display: flex; height: 100dvh; }
-
-/* ── Overlay (mobile) ── */
-.overlay {
-  display: none;
-  position: fixed; inset: 0; z-index: 40;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-}
-.overlay.show { display: block; }
-
-/* ── Sidebar ── */
-.sidebar {
-  width: var(--sidebar-w);
-  flex-shrink: 0;
-  background: var(--bg-1);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
-  z-index: 50;
-}
-
-/* Mobile: sidebar slides in from left */
-@media (max-width: 700px) {
-  .sidebar {
-    position: fixed;
-    top: 0; left: 0;
-    height: 100dvh;
-    transform: translateX(-100%);
-    padding-top: var(--safe-top);
-  }
-  .sidebar.open { transform: translateX(0); }
-}
-
-.sidebar-logo {
-  padding: 1.4rem 1.2rem 1.2rem;
-  border-bottom: 1px solid var(--border);
-}
-.logo-wordmark {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.1rem; font-weight: 700;
-  letter-spacing: 0.06em; color: var(--text);
-}
-.logo-wordmark span { color: var(--accent); }
-.logo-sub {
-  font-size: 0.65rem; letter-spacing: 0.2em;
-  text-transform: uppercase; color: var(--text-3); margin-top: 2px;
-}
-
-.sidebar-section-label {
-  font-size: 0.6rem; letter-spacing: 0.2em;
-  text-transform: uppercase; color: var(--text-3);
-  padding: 1rem 1.2rem 0.4rem;
-}
-
-.sidebar-nav {
-  flex: 1; overflow-y: auto;
-  padding: 0.3rem 0.6rem 1rem;
-}
-
-.nav-item {
-  display: flex; align-items: center; gap: 0.65rem;
-  padding: 0.6rem 0.7rem;
-  border-radius: 6px; cursor: pointer;
-  font-size: 0.83rem; color: var(--text-2);
-  transition: background 0.15s, color 0.15s;
-  user-select: none;
-  border: 1px solid transparent;
-  margin-bottom: 2px;
-  -webkit-tap-highlight-color: transparent;
-  min-height: 44px;
-}
-.nav-item:hover { background: var(--bg-2); color: var(--text); }
-.nav-item.active {
-  background: var(--accent-lo); color: var(--accent);
-  border-color: rgba(201,168,76,0.2);
-}
-.nav-icon { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.7; }
-.nav-item.active .nav-icon { opacity: 1; }
-.nav-badge {
-  margin-left: auto; font-size: 0.6rem;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  padding: 2px 6px; border-radius: 3px;
-  background: var(--bg-3); color: var(--text-3);
-}
-.nav-item.active .nav-badge { background: var(--accent-md); color: var(--accent); }
-.nav-item.coming-soon { opacity: 0.45; cursor: default; pointer-events: none; }
-.nav-divider { height: 1px; background: var(--border); margin: 0.6rem 0.7rem; }
-
-.sidebar-footer {
-  border-top: 1px solid var(--border);
-  padding: 0.8rem 0.6rem;
-  padding-bottom: calc(0.8rem + var(--safe-bottom));
-}
-.settings-row {
-  display: flex; align-items: center; gap: 0.65rem;
-  padding: 0.5rem 0.7rem; border-radius: 6px;
-  cursor: pointer; font-size: 0.8rem; color: var(--text-2);
-  transition: background 0.15s, color 0.15s;
-  min-height: 44px;
-}
-.settings-row:hover { background: var(--bg-2); color: var(--text); }
-
-/* ── Main ── */
-.main {
-  flex: 1; overflow: hidden;
-  display: flex; flex-direction: column;
-  min-width: 0;
-}
-
-/* ── Topbar ── */
-.topbar {
-  height: var(--topbar-h);
-  flex-shrink: 0;
-  display: flex; align-items: center;
-  padding: 0 1.2rem;
-  padding-top: var(--safe-top);
-  height: calc(var(--topbar-h) + var(--safe-top));
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-1);
-  gap: 0.8rem;
-}
-
-.hamburger {
-  display: none;
-  background: none; border: none;
-  color: var(--text-2); cursor: pointer;
-  padding: 6px; border-radius: 6px;
-  transition: color 0.15s, background 0.15s;
-  flex-shrink: 0;
-}
-.hamburger:hover { color: var(--text); background: var(--bg-2); }
-
-@media (max-width: 700px) {
-  .hamburger { display: flex; align-items: center; justify-content: center; }
-}
-
-.topbar-title {
-  font-family: 'Syne', sans-serif;
-  font-size: 0.9rem; font-weight: 600;
-  letter-spacing: 0.04em; color: var(--text);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.topbar-status {
-  display: flex; align-items: center; gap: 0.4rem;
-  font-size: 0.72rem; color: var(--text-3);
-  margin-left: auto; white-space: nowrap;
-}
-.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-3); }
-.status-dot.ok { background: var(--green); }
-.topbar-date {
-  font-size: 0.72rem; color: var(--text-3);
-  letter-spacing: 0.04em; white-space: nowrap;
-}
-@media (max-width: 480px) { .topbar-date { display: none; } }
-
-/* ── Content ── */
-.content-area { flex: 1; overflow-y: auto; position: relative; }
-
-.panel { display: none; height: 100%; }
-.panel.active {
-  display: block;
-  animation: panelIn 0.22s ease;
-}
-@keyframes panelIn {
-  from { opacity: 0; transform: translateX(6px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-/* iframes fill the panel */
-.panel iframe {
-  width: 100%; height: 100%;
-  border: none; background: var(--bg);
-  display: block;
-}
-
-/* ── Settings Panel ── */
-.settings-panel {
-  max-width: 560px; margin: 0 auto;
-  padding: 1.5rem 1.2rem;
-  padding-bottom: calc(1.5rem + var(--safe-bottom));
-}
-.settings-section {
-  background: var(--bg-1); border: 1px solid var(--border);
-  border-radius: 10px; overflow: hidden; margin-bottom: 1.2rem;
-}
-.settings-section-header {
-  padding: 1rem 1.2rem 0.8rem;
-  border-bottom: 1px solid var(--border);
-  font-family: 'Syne', sans-serif; font-size: 0.82rem;
-  font-weight: 600; letter-spacing: 0.06em;
-  text-transform: uppercase; color: var(--text-2);
-}
-.settings-row-item {
-  display: flex; align-items: flex-start;
-  padding: 0.9rem 1.2rem; gap: 1rem;
-  border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
-}
-.settings-row-item:last-child { border-bottom: none; }
-.settings-row-label { flex: 1; min-width: 140px; }
-.settings-row-label strong { font-size: 0.85rem; font-weight: 500; color: var(--text); display: block; }
-.settings-row-label small { font-size: 0.75rem; color: var(--text-2); line-height: 1.5; }
-.settings-input-group { display: flex; gap: 0.5rem; flex: 1.5; min-width: 200px; }
-.settings-input-group input {
-  flex: 1; background: var(--bg-2); border: 1px solid var(--border-md);
-  color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.8rem;
-  padding: 0.55rem 0.8rem; border-radius: 5px; outline: none;
-  transition: border-color 0.2s; min-width: 0;
-  min-height: 44px;
-}
-.settings-input-group input:focus { border-color: var(--accent); }
-.settings-input-group input::placeholder { color: var(--text-3); }
-.btn-sm {
-  padding: 0.5rem 1rem; background: var(--accent);
-  color: #0C0C10; border: none; border-radius: 5px;
-  font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 500;
-  cursor: pointer; white-space: nowrap;
-  transition: background 0.2s; min-height: 44px;
-}
-.btn-sm:hover { background: #DDB85A; }
-.key-saved-badge {
-  display: none; font-size: 0.72rem; color: var(--green);
-  padding: 3px 8px; border: 1px solid rgba(74,202,122,0.3); border-radius: 4px;
-}
-
-/* Install banner */
-.install-banner {
-  display: none;
-  margin: 0 0 1.2rem;
-  background: var(--accent-lo); border: 1px solid rgba(201,168,76,0.25);
-  border-radius: 10px; padding: 1rem 1.2rem;
-  align-items: center; gap: 1rem; flex-wrap: wrap;
-}
-.install-banner.show { display: flex; }
-.install-banner p { flex: 1; font-size: 0.82rem; color: var(--text-2); min-width: 180px; }
-.install-banner p strong { color: var(--accent); display: block; margin-bottom: 2px; }
-.install-btn {
-  padding: 0.55rem 1.2rem; background: var(--accent);
-  color: #0C0C10; border: none; border-radius: 6px;
-  font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600;
-  cursor: pointer; white-space: nowrap; min-height: 44px;
-}
-
-/* Placeholder panels */
-.placeholder-panel {
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  height: 100%; gap: 1rem;
-  color: var(--text-3); font-size: 0.85rem;
-  text-align: center; padding: 2rem;
-}
-.placeholder-panel .big-icon { font-size: 2.5rem; opacity: 0.3; margin-bottom: 0.5rem; }
-.placeholder-panel strong { color: var(--text-2); font-size: 1rem; font-family: 'Syne', sans-serif; }
-
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+body{padding:1.8rem 2rem 3rem;overflow-y:auto}
+.header{margin-bottom:1.8rem}
+.header h1{font-family:'Lora',serif;font-size:1.5rem;font-weight:600;color:var(--text);margin-bottom:0.25rem}
+.header p{font-size:0.8rem;color:var(--text-2)}
+.panel{background:var(--bg-1);border:1px solid var(--border);border-radius:10px;padding:1.2rem 1.4rem;margin-bottom:1rem}
+.panel-label{font-size:0.62rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-3);margin-bottom:0.9rem}
+.lang-row{display:flex;gap:0.6rem}
+.lang-btn{flex:1;padding:0.6rem 0.5rem;background:var(--bg-2);border:1px solid var(--border-md);border-radius:6px;color:var(--text-2);font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:500;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px}
+.lang-btn:hover{background:var(--bg-3);color:var(--text)}
+.lang-btn.active{background:var(--accent-lo);border-color:rgba(201,168,76,0.35);color:var(--accent)}
+.inputs-row{display:flex;gap:1rem;flex-wrap:wrap}
+.input-group{flex:1;min-width:100px}
+.input-group.wide{flex:2}
+.input-group label{display:block;font-size:0.62rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-3);margin-bottom:0.5rem}
+input[type="number"],input[type="text"]{width:100%;padding:0.55rem 0.9rem;background:var(--bg-2);border:1px solid var(--border-md);border-radius:6px;color:var(--text);font-family:'Inter',sans-serif;font-size:0.85rem;outline:none;transition:border-color 0.2s;min-height:44px}
+input:focus{border-color:var(--accent)}
+input::placeholder{color:var(--text-3)}
+.tag-add-row{display:flex;gap:0.5rem;margin-bottom:0.8rem}
+.tag-add-row input{flex:1}
+.add-btn{padding:0.55rem 0.9rem;background:var(--accent-lo);border:1px solid rgba(201,168,76,0.3);border-radius:6px;color:var(--accent);font-size:1rem;cursor:pointer;transition:background 0.18s;flex-shrink:0;min-height:44px}
+.add-btn:hover{background:var(--accent-md)}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:0.45rem;min-height:28px}
+.tag{display:flex;align-items:center;gap:4px;padding:5px 9px 5px 10px;border-radius:20px;font-size:0.78rem;font-weight:500;cursor:pointer;transition:all 0.18s;border:1px solid;user-select:none;min-height:32px}
+.tag.inactive{background:var(--bg-2);border-color:var(--border-md);color:var(--text-3)}
+.tag.active{background:rgba(74,158,232,0.12);border-color:rgba(74,158,232,0.35);color:var(--blue)}
+.tag .x{font-size:0.68rem;opacity:0.45;transition:opacity 0.15s;margin-left:1px}
+.tag:hover .x{opacity:0.9}
+.generate-btn{width:100%;padding:0.9rem;background:var(--accent);border:none;border-radius:8px;color:#0C0C10;font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px}
+.generate-btn:hover{background:#DDB85A;transform:translateY(-1px)}
+.generate-btn:active{transform:translateY(0)}
+.generate-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+.story-out{background:var(--bg-1);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.6rem;margin-top:1rem;display:none}
+.story-out.visible{display:block}
+.story-out-title{font-family:'Lora',serif;font-size:1.2rem;font-weight:600;color:var(--accent);text-align:center;margin-bottom:1.2rem}
+.story-out-body{font-family:'Lora',serif;font-size:0.97rem;line-height:1.95;color:var(--text-2);white-space:pre-wrap}
+.audio-bar{display:flex;align-items:center;gap:12px;margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid var(--border)}
+.play-btn{width:48px;height:48px;border-radius:50%;flex-shrink:0;background:var(--accent-lo);border:1px solid rgba(201,168,76,0.3);color:var(--accent);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.18s}
+.play-btn:hover{background:var(--accent-md)}
+.track{width:100%;height:3px;background:var(--bg-3);border-radius:2px;margin-bottom:5px;overflow:hidden}
+.fill{height:100%;background:var(--accent);border-radius:2px;width:0%;transition:width 0.5s linear}
+.times{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-3)}
+.status-bar{display:flex;align-items:center;gap:8px;padding:0.6rem 0.9rem;background:var(--bg-2);border:1px solid var(--border);border-radius:6px;margin-bottom:1rem;font-size:0.78rem;color:var(--text-3)}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--text-3);flex-shrink:0}
+.status-dot.ok{background:var(--green)}
+.status-dot.warn{background:#fbbf24}
+.tts-note{font-size:0.72rem;color:var(--text-3);margin-top:0.5rem;text-align:center}
+.error-msg{color:var(--red);font-size:0.82rem;text-align:center;padding:0.4rem;margin-top:0.5rem}
+.debug-box{background:var(--bg-2);border:1px solid var(--border-md);border-radius:6px;padding:0.8rem;margin-top:0.8rem;font-size:0.72rem;color:var(--text-3);font-family:monospace;white-space:pre-wrap;display:none}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:2px}
+@media(max-width:500px){body{padding:1.2rem 1rem 2rem}.lang-btn{font-size:0.75rem;padding:0.5rem 0.2rem}}
 </style>
 </head>
 <body>
 
-<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="header">
+  <h1>🌙 Bedtime Stories</h1>
+  <p>A magical story tailored for your child — text &amp; narration</p>
+</div>
 
-<div class="shell">
+<div class="status-bar" id="statusBar">
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText">Checking API key...</span>
+</div>
 
-  <!-- ── Sidebar ── -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-wordmark">Philou<span>.</span>ai</div>
-      <div class="logo-sub">Personal Dashboard</div>
-    </div>
-
-    <div class="sidebar-section-label">Tools</div>
-
-    <nav class="sidebar-nav">
-
-      <div class="nav-item active" onclick="switchPanel('bedtime', this)">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/>
-        </svg>
-        Bedtime Stories
-        <span class="nav-badge">Live</span>
-      </div>
-
-      <div class="nav-item" onclick="switchPanel('trading', this)">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
-        </svg>
-        Trading Screener
-        <span class="nav-badge">Live</span>
-      </div>
-
-      <div class="nav-divider"></div>
-      <div class="sidebar-section-label" style="padding-top:0.2rem">Coming Soon</div>
-
-      <div class="nav-item coming-soon">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 9h5M17 9h5M2 15h5M17 15h5"/>
-        </svg>
-        Cinema
-        <span class="nav-badge">Soon</span>
-      </div>
-
-      <div class="nav-item coming-soon">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
-        </svg>
-        Sorare U23
-        <span class="nav-badge">Soon</span>
-      </div>
-
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="settings-row" onclick="switchPanel('settings', null)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-        </svg>
-        Settings
-      </div>
-    </div>
-  </aside>
-
-  <!-- ── Main ── -->
-  <div class="main">
-
-    <div class="topbar">
-      <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-        </svg>
-      </button>
-      <span class="topbar-title" id="topbarTitle">Bedtime Stories</span>
-      <div class="topbar-status">
-        <div class="status-dot" id="statusDot"></div>
-        <span id="statusLabel">No key</span>
-      </div>
-      <span class="topbar-date" id="topbarDate"></span>
-    </div>
-
-    <div class="content-area">
-
-      <!-- Bedtime Stories -->
-      <div class="panel active" id="panel-bedtime" style="height:100%">
-        <iframe id="bedtimeFrame"
-          src="https://philouai.github.io/Bedtime-story/"
-          title="Bedtime Stories">
-        </iframe>
-      </div>
-
-      <!-- Trading Screener -->
-      <div class="panel" id="panel-trading" style="height:100%">
-        <iframe id="tradingFrame"
-          src="https://philouai.github.io/trading-screener/"
-          title="Trading Screener">
-        </iframe>
-      </div>
-
-      <!-- Cinema placeholder -->
-      <div class="panel" id="panel-cinema">
-        <div class="placeholder-panel">
-          <div class="big-icon">🎬</div>
-          <strong>Cinema</strong>
-          <span>Coming soon — needs Gemini setup</span>
-        </div>
-      </div>
-
-      <!-- Sorare placeholder -->
-      <div class="panel" id="panel-sorare">
-        <div class="placeholder-panel">
-          <div class="big-icon">⚽</div>
-          <strong>Sorare U23 Builder</strong>
-          <span>Coming soon — PhilouScore team builder</span>
-        </div>
-      </div>
-
-      <!-- Settings -->
-      <div class="panel" id="panel-settings">
-        <div class="settings-panel">
-
-          <div style="margin-bottom:1.5rem">
-            <div style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:600;margin-bottom:0.3rem">Settings</div>
-            <div style="font-size:0.8rem;color:var(--text-2)">API keys and preferences</div>
-          </div>
-
-          <!-- Install banner -->
-          <div class="install-banner" id="installBanner">
-            <p><strong>📱 Install as App</strong>Tap below to add Philou.ai to your home screen for a native app experience.</p>
-            <button class="install-btn" id="installBtn" onclick="installPWA()">Install App</button>
-          </div>
-
-          <div class="settings-section">
-            <div class="settings-section-header">API Keys</div>
-
-            <div class="settings-row-item">
-              <div class="settings-row-label">
-                <strong>Anthropic Claude</strong>
-                <small>Used by Bedtime Stories. Get your key at console.anthropic.com</small>
-              </div>
-              <div style="display:flex;flex-direction:column;gap:0.4rem;flex:1.5;min-width:200px">
-                <div class="settings-input-group">
-                  <input type="password" id="anthropicKeyInput" placeholder="sk-ant-..." />
-                  <button class="btn-sm" onclick="saveKey('anthropic')">Save</button>
-                </div>
-                <span class="key-saved-badge" id="anthropicBadge">✓ Saved</span>
-              </div>
-            </div>
-
-            <div class="settings-row-item">
-              <div class="settings-row-label">
-                <strong>Google Gemini</strong>
-                <small>Used by Cinema & Trading screener. Free at aistudio.google.com</small>
-              </div>
-              <div style="display:flex;flex-direction:column;gap:0.4rem;flex:1.5;min-width:200px">
-                <div class="settings-input-group">
-                  <input type="password" id="geminiKeyInput" placeholder="AIza..." />
-                  <button class="btn-sm" onclick="saveKey('gemini')">Save</button>
-                </div>
-                <span class="key-saved-badge" id="geminiBadge">✓ Saved</span>
-              </div>
-            </div>
-
-          </div>
-
-          <div class="settings-section">
-            <div class="settings-section-header">About</div>
-            <div class="settings-row-item">
-              <div class="settings-row-label">
-                <strong>Philou.ai Dashboard</strong>
-                <small>Your personal AI-powered dashboard. Open-source on GitHub. Tools load from their own repos — no duplication needed.</small>
-              </div>
-            </div>
-          </div>
-
-          <!-- iOS install instructions -->
-          <div class="settings-section" id="iosInstall" style="display:none">
-            <div class="settings-section-header">📱 Install on iPhone</div>
-            <div class="settings-row-item">
-              <div class="settings-row-label">
-                <strong>Add to Home Screen</strong>
-                <small>1. Tap the Share button (box with arrow) in Safari<br>2. Scroll down and tap "Add to Home Screen"<br>3. Tap "Add" — it will appear as an app icon</small>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
+<div class="panel">
+  <div class="panel-label">Language</div>
+  <div class="lang-row">
+    <button class="lang-btn active" data-lang="english">🇬🇧 English</button>
+    <button class="lang-btn" data-lang="french">🇫🇷 Français</button>
+    <button class="lang-btn" data-lang="russian">🇷🇺 Русский</button>
   </div>
 </div>
 
+<div class="panel">
+  <div class="inputs-row">
+    <div class="input-group">
+      <label>Age</label>
+      <input type="number" id="ageInput" min="1" max="12" value="5" />
+    </div>
+    <div class="input-group wide">
+      <label>Themes</label>
+      <div class="tag-add-row">
+        <input type="text" id="tagInput" placeholder="pirate, dragon, firefighter…" />
+        <button class="add-btn" id="addBtn">＋</button>
+      </div>
+    </div>
+  </div>
+  <div class="tags-wrap" id="tagsWrap"></div>
+</div>
+
+<button class="generate-btn" id="genBtn">🌙 Generate bedtime story</button>
+
+<div class="story-out" id="storyOut">
+  <div class="story-out-title" id="outTitle"></div>
+  <div class="story-out-body" id="outBody"></div>
+  <div class="audio-bar" id="audioBar" style="display:none">
+    <button class="play-btn" id="playBtn">▶</button>
+    <div style="flex:1">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <div class="times"><span id="tElapsed">0:00</span><span id="tDur">--:--</span></div>
+    </div>
+  </div>
+  <div class="tts-note" id="ttsNote"></div>
+  <div class="error-msg" id="errMsg"></div>
+  <div class="debug-box" id="debugBox"></div>
+</div>
+
 <script>
-const PANEL_TITLES = {
-  bedtime:  'Bedtime Stories',
-  trading:  'Trading Screener',
-  cinema:   'Cinema',
-  sorare:   'Sorare U23',
-  settings: 'Settings',
-};
+let lang = 'english';
+let tags = [{text:'pirate',active:true},{text:'treasure',active:true},{text:'dragon',active:false}];
+let fullText = '';
+let geminiKey = '';
+let isSpeaking = false;
+let audioEl = null;
+let progressTimer = null;
 
-let activePanel = 'bedtime';
-let deferredInstall = null;
+window.addEventListener('message', e => {
+  if (e.data?.type === 'GEMINI_KEY') { geminiKey = e.data.key; updateStatus(); }
+});
 
-// ── Sidebar ──
-function toggleSidebar() {
-  const s = document.getElementById('sidebar');
-  const o = document.getElementById('overlay');
-  const open = s.classList.contains('open');
-  if (open) { s.classList.remove('open'); o.classList.remove('show'); }
-  else { s.classList.add('open'); o.classList.add('show'); }
-}
-
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('overlay').classList.remove('show');
-}
-
-// ── Panel switching ──
-function switchPanel(id, navEl) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel-' + id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if (navEl) navEl.classList.add('active');
-  document.getElementById('topbarTitle').textContent = PANEL_TITLES[id] || id;
-  activePanel = id;
-  closeSidebar();
-  broadcastKeys();
-}
-
-// ── API Keys ──
-function saveKey(type) {
-  const input = document.getElementById(type + 'KeyInput');
-  const badge = document.getElementById(type + 'Badge');
-  const key = input.value.trim();
-  if (!key) return;
-  localStorage.setItem('philou_' + type + '_key', key);
-  badge.style.display = 'inline-block';
-  setTimeout(() => badge.style.display = 'none', 2500);
-  updateStatus();
-  broadcastKeys();
-}
-
-function broadcastKeys() {
-  const anthropic = localStorage.getItem('philou_anthropic_key');
-  const gemini = localStorage.getItem('philou_gemini_key');
-  const frames = ['bedtimeFrame', 'tradingFrame'];
-  frames.forEach(id => {
-    const f = document.getElementById(id);
-    if (!f) return;
-    try {
-      if (anthropic) f.contentWindow.postMessage({ type: 'ANTHROPIC_KEY', key: anthropic }, '*');
-      if (gemini) f.contentWindow.postMessage({ type: 'GEMINI_KEY', key: gemini }, '*');
-    } catch(e) {}
-  });
+function getKey() {
+  return geminiKey || localStorage.getItem('philou_gemini_key') || '';
 }
 
 function updateStatus() {
-  const hasKey = localStorage.getItem('philou_anthropic_key') || localStorage.getItem('philou_gemini_key');
+  const key = getKey();
   const dot = document.getElementById('statusDot');
-  const label = document.getElementById('statusLabel');
-  if (hasKey) { dot.className = 'status-dot ok'; label.textContent = 'Keys set'; }
-  else { dot.className = 'status-dot'; label.textContent = 'No key'; }
+  const txt = document.getElementById('statusText');
+  if (key) { dot.className='status-dot ok'; txt.textContent='Gemini connected — ready'; }
+  else { dot.className='status-dot warn'; txt.textContent='No API key — add Gemini key in Dashboard Settings'; }
 }
 
-// ── PWA install ──
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredInstall = e;
-  document.getElementById('installBanner').classList.add('show');
-});
-
-function installPWA() {
-  if (deferredInstall) {
-    deferredInstall.prompt();
-    deferredInstall.userChoice.then(() => {
-      deferredInstall = null;
-      document.getElementById('installBanner').classList.remove('show');
-    });
-  }
-}
-
-window.addEventListener('appinstalled', () => {
-  document.getElementById('installBanner').classList.remove('show');
-});
-
-// ── Broadcast keys when iframes load ──
-['bedtimeFrame', 'tradingFrame'].forEach(id => {
-  const f = document.getElementById(id);
-  if (f) f.addEventListener('load', broadcastKeys);
-});
-
-// ── Init ──
-(function init() {
-  const saved = { anthropic: localStorage.getItem('philou_anthropic_key'), gemini: localStorage.getItem('philou_gemini_key') };
-  if (saved.anthropic) document.getElementById('anthropicKeyInput').value = saved.anthropic;
-  if (saved.gemini) document.getElementById('geminiKeyInput').value = saved.gemini;
-  updateStatus();
-
-  const d = new Date();
-  document.getElementById('topbarDate').textContent = d.toLocaleDateString('en-GB', {
-    weekday: 'short', day: 'numeric', month: 'short'
+document.querySelectorAll('.lang-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.lang-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active'); lang = b.dataset.lang;
   });
+});
 
-  // Show iOS install tip in settings
-  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.navigator.standalone;
-  if (isIOS) document.getElementById('iosInstall').style.display = 'block';
-})();
+function renderTags() {
+  const w = document.getElementById('tagsWrap');
+  w.innerHTML = '';
+  tags.forEach((t, i) => {
+    const el = document.createElement('div');
+    el.className = 'tag ' + (t.active ? 'active' : 'inactive');
+    el.innerHTML = `<span>${t.text}</span><span class="x">✕</span>`;
+    el.querySelector('span:first-child').onclick = () => { tags[i].active = !tags[i].active; renderTags(); };
+    el.querySelector('.x').onclick = e => { e.stopPropagation(); tags.splice(i,1); renderTags(); };
+    w.appendChild(el);
+  });
+}
+
+function addTag() {
+  const v = document.getElementById('tagInput').value.trim().toLowerCase();
+  if (!v || tags.find(t => t.text === v)) return;
+  tags.push({text:v, active:true}); renderTags();
+  document.getElementById('tagInput').value = '';
+  document.getElementById('tagInput').focus();
+}
+document.getElementById('addBtn').onclick = addTag;
+document.getElementById('tagInput').addEventListener('keydown', e => { if(e.key==='Enter') addTag(); });
+
+function fmt(s) { return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`; }
+
+const LANG_CODES = { english:'en', french:'fr', russian:'ru' };
+
+function stopAudio() {
+  if (audioEl) { audioEl.pause(); audioEl.src=''; audioEl=null; }
+  clearInterval(progressTimer); isSpeaking=false;
+  document.getElementById('playBtn').textContent='▶';
+  document.getElementById('fill').style.width='0%';
+  document.getElementById('tElapsed').textContent='0:00';
+}
+
+function splitChunks(text, maxLen) {
+  const sentences = text.match(/[^.!?…\n]+[.!?…\n]*/g) || [text];
+  const chunks=[]; let cur='';
+  for (const s of sentences) {
+    if ((cur+s).length > maxLen && cur) { chunks.push(cur.trim()); cur=s; } else cur+=s;
+  }
+  if (cur.trim()) chunks.push(cur.trim());
+  return chunks;
+}
+
+function playChunks(chunks, idx) {
+  if (idx >= chunks.length) {
+    isSpeaking=false; document.getElementById('playBtn').textContent='▶';
+    document.getElementById('fill').style.width='100%'; clearInterval(progressTimer); return;
+  }
+  const code = LANG_CODES[lang];
+  const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(chunks[idx])}&tl=${code}&client=tw-ob`;
+  const audio = new Audio(url); audioEl=audio;
+  if (idx===0) {
+    const estSecs=(fullText.split(/\s+/).length/130)*60;
+    document.getElementById('tDur').textContent=fmt(estSecs);
+    const start=Date.now();
+    progressTimer=setInterval(()=>{
+      const e=(Date.now()-start)/1000;
+      document.getElementById('tElapsed').textContent=fmt(e);
+      document.getElementById('fill').style.width=Math.min((e/estSecs)*100,100)+'%';
+    },500);
+    isSpeaking=true; document.getElementById('playBtn').textContent='⏸';
+  }
+  audio.onended=()=>playChunks(chunks,idx+1);
+  audio.onerror=()=>{ clearInterval(progressTimer); isSpeaking=false; document.getElementById('playBtn').textContent='▶'; fallbackTTS(fullText); };
+  audio.play().catch(()=>{ isSpeaking=false; document.getElementById('playBtn').textContent='▶'; document.getElementById('ttsNote').textContent='⚠ Tap Play to start'; });
+}
+
+function fallbackTTS(text) {
+  const synth=window.speechSynthesis; synth.cancel();
+  const utter=new SpeechSynthesisUtterance(text);
+  const codes={english:'en-US',french:'fr-FR',russian:'ru-RU'};
+  utter.lang=codes[lang]; utter.rate=0.85;
+  const voices=synth.getVoices(); const prefix=codes[lang].split('-')[0];
+  const v=voices.find(v=>v.lang===codes[lang])||voices.find(v=>v.lang.startsWith(prefix));
+  if(v) utter.voice=v; synth.speak(utter);
+  isSpeaking=true; document.getElementById('playBtn').textContent='⏸';
+  const estSecs=(text.split(/\s+/).length/130)*60;
+  document.getElementById('tDur').textContent=fmt(estSecs);
+  const start=Date.now();
+  progressTimer=setInterval(()=>{
+    const e=(Date.now()-start)/1000;
+    document.getElementById('tElapsed').textContent=fmt(e);
+    document.getElementById('fill').style.width=Math.min((e/estSecs)*100,100)+'%';
+  },500);
+  utter.onend=()=>{ clearInterval(progressTimer); isSpeaking=false; document.getElementById('playBtn').textContent='▶'; };
+}
+
+document.getElementById('playBtn').addEventListener('click', ()=>{
+  if (!fullText) return;
+  if (isSpeaking) { stopAudio(); window.speechSynthesis?.cancel(); }
+  else { document.getElementById('ttsNote').textContent=''; playChunks(splitChunks(fullText,195),0); }
+});
+
+document.getElementById('genBtn').addEventListener('click', async () => {
+  stopAudio(); window.speechSynthesis?.cancel();
+  const key = getKey();
+  if (!key) {
+    document.getElementById('errMsg').textContent='No Gemini API key — add it in Dashboard Settings.';
+    document.getElementById('storyOut').classList.add('visible'); return;
+  }
+
+  document.getElementById('errMsg').textContent='';
+  document.getElementById('ttsNote').textContent='';
+  document.getElementById('debugBox').style.display='none';
+  document.getElementById('storyOut').classList.add('visible');
+  document.getElementById('outTitle').textContent='⏳ Writing your story...';
+  document.getElementById('outBody').textContent='';
+  document.getElementById('audioBar').style.display='none';
+  document.getElementById('genBtn').disabled=true;
+  fullText='';
+
+  const age=parseInt(document.getElementById('ageInput').value)||5;
+  const active=tags.filter(t=>t.active).map(t=>t.text);
+  const themeStr=active.length?`Themes to include: ${active.join(', ')}.`:'';
+  const langMap={
+    english:'Write the entire story in English.',
+    french:'Écris toute l\'histoire en français.',
+    russian:'Напиши всю историю на русском языке.',
+  };
+
+  const prompt=`Write a bedtime story for a ${age}-year-old child.
+Rules:
+- First line: only the story title (no label, no quotes)
+- Second line: blank
+- Then the full story body: 5-6 paragraphs, approximately 400-500 words
+- Calm, gentle tone — helps child fall asleep
+- Simple positive message
+- End peacefully
+- ${themeStr}
+- ${langMap[lang]}
+- Plain text only, no markdown, no asterisks, no bullet points`;
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
+      {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          contents:[{parts:[{text:prompt}]}],
+          generationConfig:{
+            temperature:0.85,
+            maxOutputTokens:8192,
+            topP:0.95
+          }
+        })
+      }
+    );
+
+    const json = await res.json();
+
+    // Show debug info
+    const debugEl = document.getElementById('debugBox');
+    debugEl.textContent = 'finish_reason: ' + (json.candidates?.[0]?.finishReason || 'unknown') +
+      '\ntoken_count: ' + (json.usageMetadata?.candidatesTokenCount || 'unknown');
+    debugEl.style.display = 'block';
+
+    if (!res.ok) throw new Error(json.error?.message || res.statusText);
+
+    // Collect all text parts
+    const parts = json.candidates?.[0]?.content?.parts || [];
+    const raw = parts.map(p => p.text || '').join('').trim();
+
+    if (!raw) throw new Error('Empty response — finish_reason: ' + (json.candidates?.[0]?.finishReason || 'unknown'));
+
+    // Split title from body on first newline
+    const firstNL = raw.indexOf('\n');
+    const titleText = firstNL > -1 ? raw.slice(0, firstNL).trim() : raw;
+    const bodyText  = firstNL > -1 ? raw.slice(firstNL).replace(/^\n+/, '').trim() : '';
+
+    document.getElementById('outTitle').textContent = titleText;
+    document.getElementById('outBody').textContent = bodyText;
+    fullText = titleText + '.\n\n' + bodyText;
+    document.getElementById('audioBar').style.display='flex';
+
+  } catch(err) {
+    document.getElementById('outTitle').textContent='';
+    document.getElementById('errMsg').textContent='Error: '+err.message;
+  }
+
+  document.getElementById('genBtn').disabled=false;
+});
+
+renderTags();
+updateStatus();
 </script>
 </body>
 </html>
